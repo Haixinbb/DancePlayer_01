@@ -334,6 +334,29 @@
         </video>
     </div>
 
+    
+
+    <!-- 进度条 -->
+    <div class="progress-area">
+        <div class="time-row">
+            <span id="currentTimeDisplay">00:00</span>
+            <span id="durationDisplay">00:00</span>
+        </div>
+        <input type="range" id="seekSlider" value="0" step="0.01">
+    </div>
+
+    <!-- AB 循环模块 -->
+    <div class="ab-panel">
+        <span class="ab-badge">🔄 A-B 循环</span>
+        <button id="markABtn" class="brutal-btn">📍 标记 A 点</button>
+        <button id="markBBtn" class="brutal-btn">📍 标记 B 点</button>
+        <button id="clearBBtn" class="brutal-btn" style="background:#FF8C42;">✖️ 清除 B 点</button>
+        <div class="ab-info" id="abStatusDisplay">A: --:-- &nbsp;| B: --:--</div>
+        <button id="clearABBtn" class="brutal-btn clear-ab">🗑️ 清除全部</button>
+        <span style="font-size: 0.7rem; font-weight: 600;">✨ 播放到B点自动跳回A点</span>
+    </div>
+
+
     <!-- 导入文件区 + 基础控制 -->
     <div class="controls-grid">
         <div class="ctrl-group">
@@ -359,25 +382,7 @@
         </div>
     </div>
 
-    <!-- 进度条 -->
-    <div class="progress-area">
-        <div class="time-row">
-            <span id="currentTimeDisplay">00:00</span>
-            <span id="durationDisplay">00:00</span>
-        </div>
-        <input type="range" id="seekSlider" value="0" step="0.01">
-    </div>
 
-    <!-- AB 循环模块 -->
-    <div class="ab-panel">
-        <span class="ab-badge">🔄 A-B 循环</span>
-        <button id="markABtn" class="brutal-btn">📍 标记 A 点</button>
-        <button id="markBBtn" class="brutal-btn">📍 标记 B 点</button>
-        <button id="clearBBtn" class="brutal-btn" style="background:#FF8C42;">✖️ 清除 B 点</button>
-        <div class="ab-info" id="abStatusDisplay">A: --:-- &nbsp;| B: --:--</div>
-        <button id="clearABBtn" class="brutal-btn clear-ab">🗑️ 清除全部</button>
-        <span style="font-size: 0.7rem; font-weight: 600;">✨ 播放到B点自动跳回A点</span>
-    </div>
 
     <!-- 抖音下载引导 -->
     <div class="external-guide">
