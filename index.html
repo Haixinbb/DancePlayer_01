@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>扒舞实验室 | 镜像·变速·AB循环</title>
     <style>
-        /* ---------- 波普 / 新粗野主义风格 (Neo-Brutalism + Pop Art) ---------- */
+        /* ---------- 波普 / 新粗野主义风格 ---------- */
         * {
             box-sizing: border-box;
             user-select: none;
@@ -87,7 +87,7 @@
             display: block;
             background: black;
             transition: transform 0.15s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            pointer-events: none; /* 让单击视频区域的事件由父容器处理，实现单击播放/暂停 */
+            pointer-events: none; /* 让父容器捕获点击，实现自定义播放/暂停 */
         }
         video.mirror-mode {
             transform: scaleX(-1);
@@ -323,12 +323,12 @@
 <div class="dance-lab">
     <div class="hero">
         <h1>🕺 扒舞·播放器</h1>
-        <div class="badge">MIRROR · LOOPER · SPEED</div>
+        <div class="badge">MIRROR · LOOPER · SPEED · 内联播放</div>
     </div>
 
-    <!-- 视频区域，单击事件由父容器处理 -->
+    <!-- 视频区域：添加 playsinline 强制内联播放 -->
     <div class="video-stage" id="videoContainer">
-        <video id="danceVideo" controlslist="nodownload" preload="auto" crossorigin="anonymous">
+        <video id="danceVideo" preload="auto" crossorigin="anonymous" playsinline webkit-playsinline>
             <source src="" type="video/mp4">
             您的浏览器不支持 video 标签。
         </video>
@@ -344,6 +344,7 @@
         <div class="ctrl-group">
             <button id="playPauseBtn" class="brutal-btn">⏸️ 暂停</button>
             <button id="mirrorBtn" class="brutal-btn">🪞 镜像 OFF</button>
+            <button id="fullscreenBtn" class="brutal-btn">⛶ 全屏</button>
         </div>
         <div class="ctrl-group">
             <label>⚡ 变速</label>
@@ -358,8 +359,6 @@
         </div>
     </div>
 
-    
-
     <!-- 进度条 -->
     <div class="progress-area">
         <div class="time-row">
@@ -369,7 +368,7 @@
         <input type="range" id="seekSlider" value="0" step="0.01">
     </div>
 
-    <!-- AB 循环模块 + 新增清除B点 + 导出配置 -->
+    <!-- AB 循环模块 -->
     <div class="ab-panel">
         <span class="ab-badge">🔄 A-B 循环</span>
         <button id="markABtn" class="brutal-btn">📍 标记 A 点</button>
@@ -377,11 +376,10 @@
         <button id="clearBBtn" class="brutal-btn" style="background:#FF8C42;">✖️ 清除 B 点</button>
         <div class="ab-info" id="abStatusDisplay">A: --:-- &nbsp;| B: --:--</div>
         <button id="clearABBtn" class="brutal-btn clear-ab">🗑️ 清除全部</button>
-        <!-- <button id="exportConfigBtn" class="brutal-btn export-btn"></button>-->
         <span style="font-size: 0.7rem; font-weight: 600;">✨ 播放到B点自动跳回A点</span>
     </div>
 
-    <!-- 跳转工具提示 -->
+    <!-- 抖音下载引导 -->
     <div class="external-guide">
         <div class="guide-text">
             <span class="guide-icon">📱 获取抖音/TikTok视频</span>
@@ -393,7 +391,7 @@
     </div>
 
     <footer>
-        🎧 硬核镜像/变速功能 · 舞蹈扒舞无缝AB循环 · 提示：请先使用上方工具下载视频，再通过「本地导入」载入MP4
+        🎧 内联播放（不自动全屏）· 单击视频播放/暂停 · 空格键 · 硬核镜像/变速/AB循环
     </footer>
 </div>
 
@@ -404,6 +402,7 @@
     const fileInput = document.getElementById('videoUpload');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const mirrorBtn = document.getElementById('mirrorBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
     const seekSlider = document.getElementById('seekSlider');
     const currentTimeSpan = document.getElementById('currentTimeDisplay');
     const durationSpan = document.getElementById('durationDisplay');
@@ -614,58 +613,19 @@
         loadVideoFromBlob(blobUrl);
     }
     
-    // ---------- 导出配置 (时间点 + 速度 + 镜像) ----------
-    function exportABConfig() {
-        if (!video.src || video.readyState === 0) {
-            alert("请先导入视频再导出配置");
-            return;
+    // ---------- 全屏功能 ----------
+    function toggleFullscreen() {
+        if (!videoContainer) return;
+        // 使用视频容器作为全屏元素，避免全屏后界面布局变化
+        const elem = videoContainer;
+        if (!document.fullscreenElement) {
+            elem.requestFullscreen().catch(err => {
+                console.warn(`全屏请求失败: ${err.message}`);
+                alert("浏览器不支持全屏或操作被拒绝");
+            });
+        } else {
+            document.exitFullscreen();
         }
-        if (aPoint === null || bPoint === null) {
-            alert("请先标记完整的 A 点和 B 点");
-            return;
-        }
-        if (bPoint <= aPoint) {
-            alert("B 点必须大于 A 点，请重新标记");
-            return;
-        }
-        
-        // 获取视频文件名 (如果有的话)
-        let videoName = "舞蹈视频";
-        if (currentBlobUrl && fileInput.files[0]) {
-            videoName = fileInput.files[0].name.replace(/\.mp4$/i, '');
-        }
-        
-        const speedText = currentRate + "x";
-        const mirrorText = isMirrored ? "已镜像 (需水平翻转)" : "未镜像";
-        const startSec = aPoint.toFixed(3);
-        const endSec = bPoint.toFixed(3);
-        const durationSec = (bPoint - aPoint).toFixed(3);
-        
-        const content = `【扒舞工具导出配置】
-视频片段: ${videoName}
-循环起点 A: ${formatTime(aPoint)} (${startSec} 秒)
-循环终点 B: ${formatTime(bPoint)} (${endSec} 秒)
-片段时长: ${formatTime(bPoint - aPoint)} (${durationSec} 秒)
-播放速度: ${speedText}
-镜像状态: ${mirrorText}
-
-使用方法:
-1. 使用专业剪辑软件 (如剪映、Premiere、Final Cut) 导入原始视频文件。
-2. 根据上方 A/B 时间点精确裁剪片段 (起点 ${startSec}s，终点 ${endSec}s)。
-3. 在软件中设置片段速度为 ${speedText}，并勾选“水平翻转” (若需要镜像)。
-4. 导出视频即可获得与扒舞工具内预览完全一致的效果。
-
-(注: 由于浏览器技术限制，无法直接导出应用了变速/镜像的完整视频片段，故提供此配置辅助您在专业工具中快速制作。)`;
-        
-        const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.href = url;
-        link.download = `${videoName}_AB循环_${formatTime(aPoint)}_to_${formatTime(bPoint)}.txt`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
     }
     
     // ---------- 事件绑定 ----------
@@ -677,6 +637,7 @@
     
     playPauseBtn.addEventListener('click', togglePlayPause);
     mirrorBtn.addEventListener('click', toggleMirror);
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
     markABtn.addEventListener('click', markA);
     markBBtn.addEventListener('click', markB);
     clearBBtn.addEventListener('click', clearBOnly);
@@ -700,7 +661,7 @@
     
     // 单击视频区域切换播放/暂停
     videoContainer.addEventListener('click', (e) => {
-        // 避免误点到 slider 或按钮冒泡引起重复 (但 video 区域没有其他交互元素)
+        // 避免点击全屏按钮时误触发（但按钮在外部，不影响）
         togglePlayPause();
     });
     
@@ -731,7 +692,7 @@
     
     updateABDisplay();
     setPlaybackRate(1.0);
-    console.log("✨ 扒舞工具启动 | 单击视频切换播放/暂停 | 单独清除B点 | 导出剪辑配置");
+    console.log("✨ 扒舞工具启动 | 内联播放（手机不自动全屏）| 单击视频切换 | 单独清除B点");
 </script>
 </body>
 </html>
