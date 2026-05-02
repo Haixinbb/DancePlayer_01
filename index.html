@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>扒舞实验室 | 镜像·变速·AB循环</title>
+    <style>
+        /* ---------- 波普 / 新粗野主义风格 (Neo-Brutalism + Pop Art) ---------- */
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #FEF9E8;
+            font-family: 'Inter', 'Poppins', system-ui, 'Segoe UI', 'Courier New', monospace;
+            font-weight: 600;
+            padding: 24px 20px;
+        }
+
+        .dance-lab {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border: 3px solid #000000;
+            box-shadow: 8px 8px 0px 0px #000000;
+            padding: 24px 28px;
+            transition: all 0.1s ease;
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 16px 12px;
+            }
+            .dance-lab {
+                padding: 18px 16px;
+                box-shadow: 5px 5px 0px 0px #000000;
+            }
+        }
+
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 3px solid #000;
+            margin-bottom: 28px;
+            padding-bottom: 12px;
+        }
+        h1 {
+            font-size: 2.2rem;
+            letter-spacing: -1px;
+            background: #FFD93D;
+            display: inline-block;
+            padding: 0 12px 0 8px;
+            border: 2px solid #000;
+            box-shadow: 4px 4px 0 0 #000;
+            margin: 0 0 8px 0;
+            font-weight: 800;
+        }
+        .badge {
+            background: #FF4B4B;
+            color: white;
+            padding: 6px 14px;
+            border: 2px solid #000;
+            box-shadow: 3px 3px 0 0 #000;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .video-stage {
+            margin: 20px 0 24px 0;
+            background: #1e1e1e;
+            border: 3px solid #000000;
+            box-shadow: 6px 6px 0 0 #000000;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: black;
+            transition: transform 0.15s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            pointer-events: none; /* 让单击视频区域的事件由父容器处理，实现单击播放/暂停 */
+        }
+        video.mirror-mode {
+            transform: scaleX(-1);
+        }
+
+        .controls-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin: 28px 0 20px 0;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ctrl-group {
+            background: #FFFFFF;
+            border: 2px solid #000000;
+            box-shadow: 4px 4px 0 0 #000000;
+            padding: 12px 16px;
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .ctrl-group label {
+            font-weight: 800;
+            font-size: 0.9rem;
+            background: #4D96FF;
+            padding: 4px 12px;
+            border: 2px solid #000;
+            color: #000;
+        }
+
+        .brutal-btn {
+            background: #FFD93D;
+            border: 2px solid #000000;
+            padding: 8px 18px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.05s linear;
+            box-shadow: 3px 3px 0 0 #000000;
+            color: #000;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .brutal-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 0 #000000;
+        }
+        .brutal-btn.active {
+            background: #4D96FF;
+            color: white;
+            box-shadow: inset 0 0 0 1px #000, 3px 3px 0 0 #000;
+        }
+        .file-label {
+            background: #2b2b2b;
+            color: white;
+            border: 2px solid #000;
+            padding: 8px 18px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-block;
+            box-shadow: 3px 3px 0 0 #000;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .speed-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .speed-btn {
+            min-width: 58px;
+            background: #F0F0F0;
+        }
+        .speed-btn.active-speed {
+            background: #FF4B4B;
+            color: white;
+            border-color: #000;
+        }
+
+        .external-guide {
+            margin: 20px 0 12px 0;
+            background: #FFF2DF;
+            border: 3px solid #000000;
+            box-shadow: 5px 5px 0 0 #000000;
+            padding: 16px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+        .guide-text {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .guide-icon {
+            background: #FF4B4B;
+            padding: 6px 12px;
+            border: 2px solid #000;
+            font-weight: 800;
+            font-size: 1rem;
+            color: white;
+        }
+        .guide-desc {
+            font-weight: 700;
+            background: white;
+            padding: 6px 14px;
+            border: 2px solid #000;
+            font-size: 0.85rem;
+        }
+        .btn-download-link {
+            background: #4D96FF;
+            color: white;
+            padding: 10px 22px;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-download-link:hover {
+            background: #2b7ae0;
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 0 #000;
+        }
+
+        .progress-area {
+            margin: 16px 0 20px;
+        }
+        .time-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-family: monospace;
+            font-size: 1rem;
+            background: #fff;
+            padding: 4px 6px;
+            border: 2px solid #000;
+            margin-bottom: 12px;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #FFD93D;
+            border: 2px solid #000000;
+            box-shadow: 2px 2px 0 0 #000;
+        }
+        input[type="range"]:focus {
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #FF4B4B;
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0 0 #000;
+            cursor: pointer;
+        }
+
+        .ab-panel {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #FFF6E0;
+            border: 2px solid #000;
+            padding: 12px 20px;
+            margin-top: 20px;
+        }
+        .ab-badge {
+            background: #4D96FF;
+            padding: 4px 12px;
+            border: 2px solid #000;
+            font-weight: 800;
+            font-size: 0.8rem;
+        }
+        .ab-info {
+            font-family: monospace;
+            font-weight: 800;
+            background: white;
+            padding: 5px 12px;
+            border: 2px solid #000;
+            display: inline-block;
+        }
+        .clear-ab {
+            background: #2e2e2e;
+            color: white;
+        }
+        .export-btn {
+            background: #FF4B4B;
+            color: white;
+        }
+
+        @media (max-width: 680px) {
+            .ctrl-group {
+                width: 100%;
+                justify-content: center;
+            }
+            .brutal-btn, .file-label {
+                padding: 6px 14px;
+                font-size: 0.8rem;
+            }
+            .ab-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .external-guide {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        footer {
+            margin-top: 36px;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-top: 2px solid #000;
+            padding-top: 18px;
+        }
+    </style>
+</head>
+<body>
+<div class="dance-lab">
+    <div class="hero">
+        <h1>🕺 扒舞·播放器</h1>
+        <div class="badge">MIRROR · LOOPER · SPEED</div>
+    </div>
+
+    <!-- 视频区域，单击事件由父容器处理 -->
+    <div class="video-stage" id="videoContainer">
+        <video id="danceVideo" controlslist="nodownload" preload="auto" crossorigin="anonymous">
+            <source src="" type="video/mp4">
+            您的浏览器不支持 video 标签。
+        </video>
+    </div>
+
+    <!-- 导入文件区 + 基础控制 -->
+    <div class="controls-grid">
+        <div class="ctrl-group">
+            <label>📂 本地导入</label>
+            <label for="videoUpload" class="file-label">选择 MP4</label>
+            <input type="file" id="videoUpload" accept="video/mp4,video/mpeg">
+        </div>
+        <div class="ctrl-group">
+            <button id="playPauseBtn" class="brutal-btn">⏸️ 暂停</button>
+            <button id="mirrorBtn" class="brutal-btn">🪞 镜像 OFF</button>
+        </div>
+        <div class="ctrl-group">
+            <label>⚡ 变速</label>
+            <div class="speed-buttons" id="speedGroup">
+                <button data-rate="0.25" class="brutal-btn speed-btn">0.25x</button>
+                <button data-rate="0.5" class="brutal-btn speed-btn">0.5x</button>
+                <button data-rate="0.75" class="brutal-btn speed-btn">0.75x</button>
+                <button data-rate="0.8" class="brutal-btn speed-btn">0.8x</button>
+                <button data-rate="0.9" class="brutal-btn speed-btn">0.9x</button>
+                <button data-rate="1.0" class="brutal-btn speed-btn active-speed">1.0x</button>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <!-- 进度条 -->
+    <div class="progress-area">
+        <div class="time-row">
+            <span id="currentTimeDisplay">00:00</span>
+            <span id="durationDisplay">00:00</span>
+        </div>
+        <input type="range" id="seekSlider" value="0" step="0.01">
+    </div>
+
+    <!-- AB 循环模块 + 新增清除B点 + 导出配置 -->
+    <div class="ab-panel">
+        <span class="ab-badge">🔄 A-B 循环</span>
+        <button id="markABtn" class="brutal-btn">📍 标记 A 点</button>
+        <button id="markBBtn" class="brutal-btn">📍 标记 B 点</button>
+        <button id="clearBBtn" class="brutal-btn" style="background:#FF8C42;">✖️ 清除 B 点</button>
+        <div class="ab-info" id="abStatusDisplay">A: --:-- &nbsp;| B: --:--</div>
+        <button id="clearABBtn" class="brutal-btn clear-ab">🗑️ 清除全部</button>
+        <!-- <button id="exportConfigBtn" class="brutal-btn export-btn"></button>-->
+        <span style="font-size: 0.7rem; font-weight: 600;">✨ 播放到B点自动跳回A点</span>
+    </div>
+
+    <!-- 跳转工具提示 -->
+    <div class="external-guide">
+        <div class="guide-text">
+            <span class="guide-icon">📱 获取抖音/TikTok视频</span>
+            <span class="guide-desc">👉 点击下方按钮前往专业下载站，粘贴链接解析并下载 MP4</span>
+        </div>
+        <a href="https://snapany.com/zh/tiktok" target="_blank" rel="noopener noreferrer" class="brutal-btn btn-download-link">
+            ⬇️ 打开视频下载工具 (SnapAny)
+        </a>
+    </div>
+
+    <footer>
+        🎧 硬核镜像/变速功能 · 舞蹈扒舞无缝AB循环 · 提示：请先使用上方工具下载视频，再通过「本地导入」载入MP4
+    </footer>
+</div>
+
+<script>
+    // ---------- DOM ----------
+    const video = document.getElementById('danceVideo');
+    const videoContainer = document.getElementById('videoContainer');
+    const fileInput = document.getElementById('videoUpload');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const mirrorBtn = document.getElementById('mirrorBtn');
+    const seekSlider = document.getElementById('seekSlider');
+    const currentTimeSpan = document.getElementById('currentTimeDisplay');
+    const durationSpan = document.getElementById('durationDisplay');
+    const markABtn = document.getElementById('markABtn');
+    const markBBtn = document.getElementById('markBBtn');
+    const clearBBtn = document.getElementById('clearBBtn');
+    const clearABBtn = document.getElementById('clearABBtn');
+    const abStatusDisplay = document.getElementById('abStatusDisplay');
+    
+    const speedBtns = document.querySelectorAll('.speed-btn');
+    
+    // ---------- 状态 ----------
+    let aPoint = null;
+    let bPoint = null;
+    let isMirrored = false;
+    let currentRate = 1.0;
+    let currentBlobUrl = null;
+    let isLoopingSeek = false;
+    
+    // ---------- 辅助函数 ----------
+    function formatTime(sec) {
+        if (isNaN(sec)) return '00:00';
+        const mins = Math.floor(sec / 60);
+        const remainSec = Math.floor(sec % 60);
+        return `${mins.toString().padStart(2, '0')}:${remainSec.toString().padStart(2, '0')}`;
+    }
+    
+    function updateABDisplay() {
+        let aStr = aPoint !== null ? formatTime(aPoint) : '未设置';
+        let bStr = bPoint !== null ? formatTime(bPoint) : '未设置';
+        abStatusDisplay.innerText = `A: ${aStr}  |  B: ${bStr}`;
+    }
+    
+    function resetABPoints() {
+        aPoint = null;
+        bPoint = null;
+        updateABDisplay();
+    }
+    
+    function clearBOnly() {
+        if (bPoint !== null) {
+            bPoint = null;
+            updateABDisplay();
+        } else {
+            alert("当前没有设置 B 点");
+        }
+    }
+    
+    function clearAB() {
+        aPoint = null;
+        bPoint = null;
+        updateABDisplay();
+    }
+    
+    function markA() {
+        if (!video.src || video.readyState === 0) {
+            alert("⚠️ 请先导入视频文件！");
+            return;
+        }
+        aPoint = video.currentTime;
+        if (bPoint !== null && bPoint <= aPoint) {
+            alert("⚠️ B 点已小于等于 A 点，自动清除 B 点，请重新标记 B 点 (> A)");
+            bPoint = null;
+        }
+        updateABDisplay();
+    }
+    
+    function markB() {
+        if (!video.src || video.readyState === 0) {
+            alert("⚠️ 请先导入视频文件！");
+            return;
+        }
+        if (aPoint === null) {
+            alert("🎯 请先标记 A 点作为循环起点！");
+            return;
+        }
+        const current = video.currentTime;
+        if (current <= aPoint) {
+            alert("⚠️ B 点必须大于当前 A 点");
+            return;
+        }
+        bPoint = current;
+        updateABDisplay();
+    }
+    
+    function togglePlayPause() {
+        if (!video.src || video.readyState === 0) return;
+        if (video.paused) {
+            video.play().catch(e => console.warn("播放失败", e));
+        } else {
+            video.pause();
+        }
+    }
+    
+    function updatePlayPauseUI() {
+        playPauseBtn.innerHTML = video.paused ? "▶️ 播放" : "⏸️ 暂停";
+    }
+    
+    function toggleMirror() {
+        isMirrored = !isMirrored;
+        if (isMirrored) {
+            video.classList.add('mirror-mode');
+            mirrorBtn.innerHTML = "🪞 镜像 ON";
+            mirrorBtn.classList.add('active');
+        } else {
+            video.classList.remove('mirror-mode');
+            mirrorBtn.innerHTML = "🪞 镜像 OFF";
+            mirrorBtn.classList.remove('active');
+        }
+    }
+    
+    function setPlaybackRate(rate) {
+        if (!video.src) return;
+        currentRate = rate;
+        video.playbackRate = rate;
+        speedBtns.forEach(btn => {
+            const btnRate = parseFloat(btn.getAttribute('data-rate'));
+            if (Math.abs(btnRate - rate) < 0.01) {
+                btn.classList.add('active-speed');
+            } else {
+                btn.classList.remove('active-speed');
+            }
+        });
+        if ('preservesPitch' in video) video.preservesPitch = true;
+        if ('webkitPreservesPitch' in video) video.webkitPreservesPitch = true;
+    }
+    
+    function updateProgressAndTime() {
+        if (!video.duration || isNaN(video.duration)) return;
+        const percent = (video.currentTime / video.duration) * 100;
+        seekSlider.value = percent;
+        currentTimeSpan.innerText = formatTime(video.currentTime);
+        durationSpan.innerText = formatTime(video.duration);
+    }
+    
+    function seekTo(percent) {
+        if (!video.duration || isNaN(video.duration)) return;
+        const newTime = (percent / 100) * video.duration;
+        video.currentTime = newTime;
+        updateProgressAndTime();
+    }
+    
+    function handleABLoop() {
+        if (aPoint === null || bPoint === null) return;
+        if (bPoint <= aPoint) return;
+        let curTime = video.currentTime;
+        if (curTime >= bPoint) {
+            if (isLoopingSeek) return;
+            isLoopingSeek = true;
+            video.currentTime = aPoint;
+            isLoopingSeek = false;
+        }
+    }
+    
+    function resetOnNewVideo() {
+        resetABPoints();
+        if (isMirrored) {
+            isMirrored = false;
+            video.classList.remove('mirror-mode');
+            mirrorBtn.innerHTML = "🪞 镜像 OFF";
+            mirrorBtn.classList.remove('active');
+        }
+        setPlaybackRate(1.0);
+        updatePlayPauseUI();
+        if (video.duration && isFinite(video.duration)) {
+            durationSpan.innerText = formatTime(video.duration);
+            seekSlider.max = 100;
+        } else {
+            durationSpan.innerText = '00:00';
+        }
+        currentTimeSpan.innerText = '00:00';
+        seekSlider.value = 0;
+        isLoopingSeek = false;
+        updatePlayPauseUI();
+    }
+    
+    function loadVideoFromBlob(blobUrl) {
+        if (currentBlobUrl && currentBlobUrl !== blobUrl) {
+            URL.revokeObjectURL(currentBlobUrl);
+        }
+        if (video.src && video.src.startsWith('blob:') && video.src !== blobUrl) {
+            try { URL.revokeObjectURL(video.src); } catch(e) {}
+        }
+        video.src = blobUrl;
+        video.load();
+        video.onloadedmetadata = () => {
+            resetOnNewVideo();
+            if (video.duration) durationSpan.innerText = formatTime(video.duration);
+            updateProgressAndTime();
+            video.pause();
+            updatePlayPauseUI();
+            if ('preservesPitch' in video) video.preservesPitch = true;
+        };
+        video.onerror = () => alert("视频加载失败，文件可能损坏或格式不支持");
+    }
+    
+    function handleFileUpload(file) {
+        if (!file || !file.type.includes('video/mp4')) {
+            alert("请选择 .mp4 格式的视频文件");
+            return;
+        }
+        if (currentBlobUrl) {
+            URL.revokeObjectURL(currentBlobUrl);
+            currentBlobUrl = null;
+        }
+        const blobUrl = URL.createObjectURL(file);
+        currentBlobUrl = blobUrl;
+        loadVideoFromBlob(blobUrl);
+    }
+    
+    // ---------- 导出配置 (时间点 + 速度 + 镜像) ----------
+    function exportABConfig() {
+        if (!video.src || video.readyState === 0) {
+            alert("请先导入视频再导出配置");
+            return;
+        }
+        if (aPoint === null || bPoint === null) {
+            alert("请先标记完整的 A 点和 B 点");
+            return;
+        }
+        if (bPoint <= aPoint) {
+            alert("B 点必须大于 A 点，请重新标记");
+            return;
+        }
+        
+        // 获取视频文件名 (如果有的话)
+        let videoName = "舞蹈视频";
+        if (currentBlobUrl && fileInput.files[0]) {
+            videoName = fileInput.files[0].name.replace(/\.mp4$/i, '');
+        }
+        
+        const speedText = currentRate + "x";
+        const mirrorText = isMirrored ? "已镜像 (需水平翻转)" : "未镜像";
+        const startSec = aPoint.toFixed(3);
+        const endSec = bPoint.toFixed(3);
+        const durationSec = (bPoint - aPoint).toFixed(3);
+        
+        const content = `【扒舞工具导出配置】
+视频片段: ${videoName}
+循环起点 A: ${formatTime(aPoint)} (${startSec} 秒)
+循环终点 B: ${formatTime(bPoint)} (${endSec} 秒)
+片段时长: ${formatTime(bPoint - aPoint)} (${durationSec} 秒)
+播放速度: ${speedText}
+镜像状态: ${mirrorText}
+
+使用方法:
+1. 使用专业剪辑软件 (如剪映、Premiere、Final Cut) 导入原始视频文件。
+2. 根据上方 A/B 时间点精确裁剪片段 (起点 ${startSec}s，终点 ${endSec}s)。
+3. 在软件中设置片段速度为 ${speedText}，并勾选“水平翻转” (若需要镜像)。
+4. 导出视频即可获得与扒舞工具内预览完全一致的效果。
+
+(注: 由于浏览器技术限制，无法直接导出应用了变速/镜像的完整视频片段，故提供此配置辅助您在专业工具中快速制作。)`;
+        
+        const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = `${videoName}_AB循环_${formatTime(aPoint)}_to_${formatTime(bPoint)}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+    
+    // ---------- 事件绑定 ----------
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) handleFileUpload(file);
+        fileInput.value = '';
+    });
+    
+    playPauseBtn.addEventListener('click', togglePlayPause);
+    mirrorBtn.addEventListener('click', toggleMirror);
+    markABtn.addEventListener('click', markA);
+    markBBtn.addEventListener('click', markB);
+    clearBBtn.addEventListener('click', clearBOnly);
+    clearABBtn.addEventListener('click', clearAB);
+    
+    seekSlider.addEventListener('input', (e) => {
+        if (!video.duration || isNaN(video.duration)) return;
+        seekTo(parseFloat(e.target.value));
+    });
+    
+    speedBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const rate = parseFloat(btn.getAttribute('data-rate'));
+            if (!isNaN(rate) && video.src) {
+                setPlaybackRate(rate);
+            } else if (!video.src) {
+                alert("请先导入视频再调速");
+            }
+        });
+    });
+    
+    // 单击视频区域切换播放/暂停
+    videoContainer.addEventListener('click', (e) => {
+        // 避免误点到 slider 或按钮冒泡引起重复 (但 video 区域没有其他交互元素)
+        togglePlayPause();
+    });
+    
+    video.addEventListener('timeupdate', () => {
+        if (video.duration && isFinite(video.duration)) {
+            updateProgressAndTime();
+            handleABLoop();
+        }
+    });
+    video.addEventListener('play', () => updatePlayPauseUI());
+    video.addEventListener('pause', () => updatePlayPauseUI());
+    video.addEventListener('loadeddata', () => {
+        if (video.duration) durationSpan.innerText = formatTime(video.duration);
+        updateProgressAndTime();
+        setPlaybackRate(currentRate);
+        updateABDisplay();
+    });
+    video.addEventListener('seeked', () => updateProgressAndTime());
+    video.addEventListener('ended', () => updatePlayPauseUI());
+    
+    // 空格键全局播放/暂停
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            e.preventDefault();
+            togglePlayPause();
+        }
+    });
+    
+    updateABDisplay();
+    setPlaybackRate(1.0);
+    console.log("✨ 扒舞工具启动 | 单击视频切换播放/暂停 | 单独清除B点 | 导出剪辑配置");
+</script>
+</body>
+</html>
