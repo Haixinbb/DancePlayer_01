@@ -344,7 +344,7 @@
         <div class="ctrl-group">
             <button id="playPauseBtn" class="brutal-btn">⏸️ 暂停</button>
             <button id="mirrorBtn" class="brutal-btn">🪞 镜像 OFF</button>
-            <button id="fullscreenBtn" class="brutal-btn">⛶ 全屏</button>
+            <!-- <button id="fullscreenBtn" class="brutal-btn">⛶ 全屏</button> -->
         </div>
         <div class="ctrl-group">
             <label>⚡ 变速</label>
@@ -391,7 +391,7 @@
     </div>
 
     <footer>
-        🎧 内联播放（不自动全屏）· 单击视频播放/暂停 · 空格键 · 硬核镜像/变速/AB循环
+        🎧 硬核镜像/变速功能 · 舞蹈扒舞无缝AB循环 · 提示：请先使用上方工具下载视频，再通过「本地导入」载入MP4
     </footer>
 </div>
 
@@ -402,7 +402,6 @@
     const fileInput = document.getElementById('videoUpload');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const mirrorBtn = document.getElementById('mirrorBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
     const seekSlider = document.getElementById('seekSlider');
     const currentTimeSpan = document.getElementById('currentTimeDisplay');
     const durationSpan = document.getElementById('durationDisplay');
@@ -637,7 +636,6 @@
     
     playPauseBtn.addEventListener('click', togglePlayPause);
     mirrorBtn.addEventListener('click', toggleMirror);
-    fullscreenBtn.addEventListener('click', toggleFullscreen);
     markABtn.addEventListener('click', markA);
     markBBtn.addEventListener('click', markB);
     clearBBtn.addEventListener('click', clearBOnly);
